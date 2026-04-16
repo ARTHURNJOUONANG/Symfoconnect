@@ -33,7 +33,7 @@ final class PostController extends AbstractController
 
             $this->addFlash('success', 'Post publié avec succès.');
 
-            return $this->redirectToRoute('app_feed');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('post/new.html.twig', [

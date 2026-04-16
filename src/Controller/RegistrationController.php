@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use App\Security\LoginFormAuthenticator;
 
 final class RegistrationController extends AbstractController
 {
@@ -21,7 +23,9 @@ final class RegistrationController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        UserAuthenticatorInterface $userAuthenticator,
+        LoginFormAuthenticator $loginFormAuthenticator
     ): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_feed');
@@ -60,9 +64,9 @@ final class RegistrationController extends AbstractController
                     ]);
                 }
 
-                $this->addFlash('success', 'Compte cree avec succes. Vous pouvez vous connecter.');
+                $this->addFlash('success', 'Compte cree avec succes. Bienvenue sur SymfoConnect.');
 
-                return $this->redirectToRoute('app_login');
+                return $userAuthenticator->authenticateUser($user, $loginFormAuthenticator, $request);
             }
         }
 

@@ -12,8 +12,7 @@ final class SecurityController extends AbstractController
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // On laisse Symfony Security gérer le POST (form_login check_path).
-        // Si jamais le contrôleur est appelé malgré tout, on renvoie le formulaire.
+        // Le POST /login est traité par LoginFormAuthenticator ; ce contrôleur affiche le formulaire GET.
         if ($this->getUser()) {
             return $this->redirectToRoute('app_feed');
         }

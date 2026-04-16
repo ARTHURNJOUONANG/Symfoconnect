@@ -31,8 +31,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min: 3, max: 50)]
     private ?string $username = null;
 
+    /**
+     * Hash défini par l'application (inscription, reset) — pas par le formulaire directement.
+     */
     #[ORM\Column]
-    #[Assert\NotBlank]
     private ?string $password = null;
 
     /**

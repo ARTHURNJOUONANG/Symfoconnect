@@ -7,9 +7,11 @@ use App\Repository\PostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class FeedController extends AbstractController
 {
+    #[IsGranted('ROLE_USER')]
     #[Route('/feed', name: 'app_feed', methods: ['GET'])]
     public function index(PostRepository $postRepository): Response
     {
