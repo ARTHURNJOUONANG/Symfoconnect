@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription | SymfoConnect{% endblock %}
+
+{% block body %}
+    <h1 class="section-title">Inscription</h1>
+
+    <div class="card">
+        {{ form_start(registrationForm) }}
+            {{ form_row(registrationForm.email) }}
+            {{ form_row(registrationForm.username) }}
+            {{ form_row(registrationForm.plainPassword, { label: 'Mot de passe' }) }}
+            <button type="submit">Creer mon compte</button>
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %}

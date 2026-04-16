@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}SymfoConnect{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}{% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+
+        {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
+        {% if frankenphpHotReload %}
+        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
+        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
+        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
+        {% endif %}
+    </head>
+    <body>
+        <nav class="topbar">
+            <div class="container topbar-inner">
+                <a href="{{ path('app_home') }}" class="brand">
+                    <span class="brand-dot"></span>
+                    <span>SymfoConnect Dark</span>
+                </a>
+                <div class="menu">
+                    <a class="menu-link" data-nav-link href="{{ path('app_home') }}">Accueil</a>
+                    {% if app.user %}
+                        <a class="menu-link" data-nav-link href="{{ path('app_feed') }}">Feed</a>
+                        <a class="menu-link" data-nav-link href="{{ path('app_post_new') }}">Nouveau post</a>
+                        <a class="menu-link" data-nav-link href="{{ path('app_profile_show', { username: app.user.username }) }}">
+                            {{ app.user.username }}
+                        </a>
+                        <form method="post" action="{{ path('app_logout') }}" style="display: inline;">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="menu-link" style="border: 0; background: transparent;">Deconnexion</button>
+                        </form>
+                    {% else %}
+                        <a class="menu-link" data-nav-link href="{{ path('app_login') }}">Connexion</a>
+                        <a class="menu-link" data-nav-link href="{{ path('app_register') }}">Inscription</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <main class="page">
+            <div class="container feed-layout">
+                {% for message in app.flashes('success') %}
+                    <div class="flash flash-success">{{ message }}</div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="flash flash-error">{{ message }}</div>
+                {% endfor %}
+
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+    </body>
+</html>

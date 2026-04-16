@@ -1,0 +1,35 @@
+services:
+  ###> doctrine/doctrine-bundle ###
+  database:
+    image: mysql:8.4
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfoconnect_db
+    ports:
+      - "6033:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  phpmyadmin-symfoconnect:
+    image: phpmyadmin:apache
+    container_name: phpmyadmin-symfoconnect
+    links:
+      - database
+    volumes:
+      - ./docker/phpmyadmin/servername.conf:/etc/apache2/conf-enabled/servername.conf:ro
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - "8081:80"
+
+    ###> symfony/mailer ###
+  mailer:
+    image: schickling/mailcatcher
+    ports: ["1025", "1080"]
+
+volumes:
+  dbdata:

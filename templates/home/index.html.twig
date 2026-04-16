@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil | SymfoConnect{% endblock %}
+
+{% block body %}
+    <div class="feed-head">
+        <h1 class="section-title">Fil d'actualite</h1>
+        <span class="chip">{{ posts|length }} post(s)</span>
+    </div>
+
+    <div class="composer-box js-reveal">
+        <a class="composer-link" href="{{ path('app_post_new') }}">
+            <span class="composer-avatar">S</span>
+            <span>Exprimez-vous... Ecrire un nouveau post</span>
+        </a>
+    </div>
+
+    {% if posts is empty %}
+        <div class="card js-reveal">
+            <p>Aucun post pour le moment.</p>
+        </div>
+    {% else %}
+        {% for post in posts %}
+            <article class="card js-reveal">
+                <p class="post-content">{{ post.content|nl2br }}</p>
+                <p class="post-meta">
+                    Par
+                    <a href="{{ path('app_profile_show', { username: post.author.username }) }}">
+                        {{ post.author.username }}
+                    </a>
+                    le {{ post.createdAt|date('d/m/Y H:i') }} · {{ post.likesCount }} like(s)
+                </p>
+                <div class="post-actions">
+                    {% if app.user %}
+                        <form method="post" action="{{ path('app_post_like_toggle', { id: post.id }) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('like_post_' ~ post.id) }}">
+                            <button type="submit" class="action-btn">
+                                {{ post.isLikedBy(app.user) ? 'Unlike' : 'Like' }}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

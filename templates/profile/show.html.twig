@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ profileUser.username }} | SymfoConnect{% endblock %}
+
+{% block body %}
+    <section class="card js-reveal">
+        <div class="profile-header">
+            {% if profileUser.avatarUrl %}
+                <img class="avatar" src="{{ profileUser.avatarUrl }}" alt="Avatar de {{ profileUser.username }}">
+            {% else %}
+                <div class="avatar-placeholder">{{ profileUser.username|first|upper }}</div>
+            {% endif %}
+            <div>
+                <h1 class="section-title">Profil de {{ profileUser.username }}</h1>
+                <p class="muted">Inscrit le {{ profileUser.createdAt|date('d/m/Y H:i') }}</p>
+                <p class="muted">{{ profileUser.followersCount }} followers · {{ profileUser.followsCount }} follows</p>
+            </div>
+        </div>
+
+        <p class="profile-bio">{{ profileUser.bio ?: 'Aucune bio renseignee.' }}</p>
+        {% if app.user and app.user.id != profileUser.id %}
+            {% if isFollowing %}
+                <form method="post" action="{{ path('app_profile_unfollow', { username: profileUser.username }) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('unfollow_' ~ profileUser.username) }}">
+                    <button class="btn" type="submit">Ne plus suivre</button>
+                </form>
+            {% else %}
+                <form method="post" action="{{ path('app_profile_follow', { username: profileUser.username }) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('follow_' ~ profileUser.username) }}">
+                    <button class="btn" type="submit">Suivre</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </section>
+
+    <section>
+        <h2 class="section-title">Posts de {{ profileUser.username }}</h2>
+        {% if posts is empty %}
+            <div class="card js-reveal">
+                <p>Cet utilisateur n'a pas encore publie de post.</p>
+            </div>
+        {% else %}
+            {% for post in posts %}
+                <article class="card js-reveal">
+                    <p class="post-content">{{ post.content|nl2br }}</p>
+                    <p class="post-meta">Publie le {{ post.createdAt|date('d/m/Y H:i') }} · {{ post.likesCount }} like(s)</p>
+                    <div class="post-actions">
+                        {% if app.user %}
+                            <form method="post" action="{{ path('app_post_like_toggle', { id: post.id }) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('like_post_' ~ post.id) }}">
+                                <button type="submit" class="action-btn">
+                                    {{ post.isLikedBy(app.user) ? 'Unlike' : 'Like' }}
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        {% endif %}
+    </section>
+{% endblock %}
