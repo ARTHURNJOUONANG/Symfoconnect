@@ -323,9 +323,10 @@ form button:hover,
     border-color: #e9edf2;
 }
 
+/* Contenu visible par défaut : si le JS ne charge pas, pas d'opacity 0 bloquante. */
 .js-reveal {
-    opacity: 0;
-    transform: translateY(10px);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .js-reveal.is-visible {
@@ -334,8 +335,8 @@ form button:hover,
 
 @keyframes fadeSlideIn {
     from {
-        opacity: 0;
-        transform: translateY(10px);
+        opacity: 0.85;
+        transform: translateY(8px);
     }
     to {
         opacity: 1;

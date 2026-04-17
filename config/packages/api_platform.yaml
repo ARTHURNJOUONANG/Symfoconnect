@@ -1,0 +1,10 @@
+api_platform:
+    title: SymfoConnect API
+    version: 1.0.0
+    defaults:
+        # Conserve la session Symfony pour reutiliser l'utilisateur connecte.
+        stateless: false
+        pagination_enabled: true
+        pagination_items_per_page: 10
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']

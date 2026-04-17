@@ -28,6 +28,7 @@
                     <a class="menu-link" data-nav-link href="{{ path('app_home') }}">Accueil</a>
                     {% if app.user %}
                         <a class="menu-link" data-nav-link href="{{ path('app_feed') }}">Feed</a>
+                        <a class="menu-link" data-nav-link href="{{ path('app_message_index') }}">Messages</a>
                         <a class="menu-link" data-nav-link href="{{ path('app_post_new') }}">Nouveau post</a>
                         <a class="menu-link" data-nav-link href="{{ path('app_profile_show', { username: app.user.username }) }}">
                             {{ app.user.username }}

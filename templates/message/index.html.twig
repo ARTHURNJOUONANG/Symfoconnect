@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messages | SymfoConnect{% endblock %}
+
+{% block body %}
+    <h1 class="section-title">Conversations</h1>
+
+    {% if conversations is empty %}
+        <div class="card">
+            <p>Aucune conversation pour le moment.</p>
+            {% if suggestedUsers is not empty %}
+                <p class="muted">Demarrer une discussion :</p>
+                <div class="post-actions">
+                    {% for suggestedUser in suggestedUsers %}
+                        <a class="action-btn" href="{{ path('app_message_thread', { username: suggestedUser.username }) }}">
+                            {{ suggestedUser.username }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">Aucun autre utilisateur disponible. Cree un deuxieme compte pour demarrer un chat.</p>
+            {% endif %}
+        </div>
+    {% else %}
+        {% for conversation in conversations %}
+            <article class="card">
+                <p class="post-meta">
+                    <a href="{{ path('app_message_thread', { username: conversation.user.username }) }}">
+                        Discussion avec {{ conversation.user.username }}
+                    </a>
+                </p>
+                <p class="post-content">
+                    {{ conversation.lastMessage.sender.id == app.user.id ? 'Vous: ' : '' }}
+                    {{ conversation.lastMessage.content|slice(0, 120) }}{% if conversation.lastMessage.content|length > 120 %}...{% endif %}
+                </p>
+                <p class="muted">
+                    Dernier message le {{ conversation.lastMessage.createdAt|date('d/m/Y H:i') }}
+                    {% if conversation.unreadCount > 0 %}
+                        · <strong>{{ conversation.unreadCount }} non lu(s)</strong>
+                    {% endif %}
+                </p>
+            </article>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

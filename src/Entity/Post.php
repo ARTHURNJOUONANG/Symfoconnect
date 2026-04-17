@@ -3,20 +3,52 @@
 namespace App\Entity;
 
 use App\Repository\PostRepository;
+use App\State\PostAuthorProcessor;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post as ApiPost;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['content' => 'partial', 'author.id' => 'exact', 'author.username' => 'partial'])]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => ['post:read']]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['post:read']]
+        ),
+        new ApiPost(
+            security: "is_granted('ROLE_USER')",
+            denormalizationContext: ['groups' => ['post:write']],
+            normalizationContext: ['groups' => ['post:read']],
+            processor: PostAuthorProcessor::class
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object.getAuthor() == user"
+        ),
+    ],
+    order: ['createdAt' => 'DESC']
+)]
 class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['post:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['post:read', 'post:write'])]
     #[Assert\NotBlank(message: 'Le contenu est obligatoire.')]
     #[Assert\Length(
         min: 3,
@@ -25,10 +57,12 @@ class Post
     private ?string $content = null;
 
     #[ORM\Column]
+    #[Groups(['post:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['post:read'])]
     private ?User $author = null;
 
     /**

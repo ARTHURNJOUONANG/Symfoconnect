@@ -6,6 +6,7 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,8 @@ final class PostController extends AbstractController
     #[Route('/post/nouveau', name: 'app_post_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        CacheItemPoolInterface $cachePool
     ): Response {
         /** @var User $author */
         $author = $this->getUser();
@@ -30,6 +32,10 @@ final class PostController extends AbstractController
             $post->setAuthor($author);
             $entityManager->persist($post);
             $entityManager->flush();
+            $cachePool->deleteItem(sprintf('feed_user_%d', $author->getId()));
+            foreach ($author->getFollowers() as $follower) {
+                $cachePool->deleteItem(sprintf('feed_user_%d', $follower->getId()));
+            }
 
             $this->addFlash('success', 'Post publié avec succès.');
 

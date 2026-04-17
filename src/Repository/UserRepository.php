@@ -53,4 +53,18 @@ class UserRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @return list<User>
+     */
+    public function findChatSuggestions(User $currentUser, int $limit = 8): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u != :current')
+            ->setParameter('current', $currentUser)
+            ->orderBy('u.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }
